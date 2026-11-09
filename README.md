@@ -1,3 +1,17 @@
+# 在 DeepSeek Harness 里内嵌 DeepSeek Chat
+
+把 [chat.deepseek.com](https://chat.deepseek.com) 直接塞进 **DeepSeek Harness 桌面版**：侧栏多一个「DeepSeek Chat」鲸鱼入口，
+主区域是一整块无边框的聊天页面（不是浏览器那种带地址栏的壳，也没有 Harness 工具栏），打开 DSH 默认就停在聊天页。
+
+项目由两部分组成：**插件**负责界面，**补丁脚本**（`patch-dsh.cjs`，把本机 `app.asar` 里一行字符串等长替换）负责让登录态跨重启保持。
+不打补丁照样能用，只是每次启动都要重新登录一次。
+
+> **非官方项目**：与 DeepSeek 无关、未获其背书，只改你自己机器上的安装。
+
+完整中文说明见 [README.zh-CN.md](README.zh-CN.md)。
+
+---
+
 # DeepSeek Chat inside DeepSeek Harness
 
 A plugin for the **[DeepSeek Harness](https://github.com/deepseek-ai)** desktop app that puts
