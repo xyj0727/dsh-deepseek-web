@@ -1,75 +1,60 @@
 # 在 DeepSeek Harness 里内嵌 DeepSeek Chat
 
-把 [chat.deepseek.com](https://chat.deepseek.com) 直接塞进 **DeepSeek Harness 桌面版**：侧栏多一个「DeepSeek Chat」鲸鱼入口，
-主区域是一整块无边框的聊天页面（不是浏览器那种带地址栏的壳，也没有 Harness 工具栏），打开 DSH 默认就停在聊天页。
+把 [chat.deepseek.com](https://chat.deepseek.com) 直接放进 **DeepSeek Harness 桌面版**：
+侧栏一个入口，主区域一整块无边框的聊天页面；再配合仓库里的补丁脚本，登录状态跨重启保持。
 
-项目由两部分组成：**插件**负责界面，**补丁脚本**（`patch-dsh.cjs`，把本机 `app.asar` 里一行字符串等长替换）负责让登录态跨重启保持。
-不打补丁照样能用，只是每次启动都要重新登录一次。
+不开浏览器、不开第二个窗口、不用任何私有 API。
 
-> **非官方项目**：与 DeepSeek 无关、未获其背书，只改你自己机器上的安装。
+> **非官方项目**。与 DeepSeek 无关，未获其背书。它是给**你自己的安装**用的客户端插件 + 本地补丁脚本。
 
-完整中文说明见 [README.zh-CN.md](README.zh-CN.md)。
-
----
-
-# DeepSeek Chat inside DeepSeek Harness
-
-A plugin for the **[DeepSeek Harness](https://github.com/deepseek-ai)** desktop app that puts
-[chat.deepseek.com](https://chat.deepseek.com) into the Harness window itself: a sidebar entry,
-a chrome-less chat page that fills the whole main area, and — with the bundled one-line patch —
-a login that survives restarts.
-
-No browser tab, no second app window, no private API.
-
-> **Unofficial.** Not affiliated with, endorsed by, or supported by DeepSeek.
-> It is a client-side plugin plus a local patch script for your own installation.
+English version: [README.en.md](README.en.md)
 
 ---
 
-## What you get
+## 效果
 
 | | |
 | --- | --- |
-| Sidebar entry | “DeepSeek Chat” with the blue whale icon, pinned above the other entries |
-| Main panel | `https://chat.deepseek.com` in a `<webview>`, 100 % full-bleed, no Harness toolbar around it |
-| On launch | the chat panel is selected automatically, so DSH opens straight into the chat page |
-| Login | persists across restarts **after** the patch below is applied (otherwise you re-login every launch) |
+| 侧栏入口 | 「DeepSeek Chat」+ 蓝色鲸鱼图标，排在其它入口之前 |
+| 主面板 | 用 `<webview>` 加载 `https://chat.deepseek.com`，100% 铺满，外面没有 DSH 工具栏 |
+| 启动时 | 自动选中该面板，打开 DSH 就直接是聊天页 |
+| 登录 | 打了下面的补丁后跨重启保持；不打补丁则每次启动都要重新登录 |
 
 ---
 
-## ⚠️ This project has two parts
+## ⚠️ 这个项目由两部分组成
 
-| Part | Files | Purpose | Required? |
+| 部分 | 文件 | 作用 | 必须吗 |
 | --- | --- | --- | --- |
-| **1. Plugin** | `index.js`, `client.js`, `cordis.patch.yml`, `locale/`, `icon.*` | sidebar entry + chat panel | yes |
-| **2. Harness patch** | `patch-dsh.cjs` | makes the webview session persistent → no daily login | **needed for “stay logged in”**, not for rendering the page |
+| **1. 插件** | `index.js`、`client.js`、`cordis.patch.yml`、`locale/`、`icon.*` | 侧栏入口 + 聊天主面板 | 必须 |
+| **2. 本体补丁** | `patch-dsh.cjs` | 让 webview 的会话分区持久化，免去每次登录 | **只为「免登录」所必需**，不影响页面能不能显示 |
 
-The patch modifies **your local copy** of the Harness `app.asar` (one string, same byte length).
-It contains no DeepSeek code and is not a redistribution of anything.
-
----
-
-## Requirements
-
-- DeepSeek Harness **desktop** app (Electron), tested with `0.2.2-rc.1` on Windows.
-  A Harness build that exposes the `main` and `sidebar.panellist` client slots is required.
-- A DSH profile you can edit (default: `%USERPROFILE%\.dsh\profiles\desktop`).
-- Node.js + pnpm on `PATH` (DSH ships both; a system install is fine).
+补丁改的是**你本机** Harness 的 `app.asar`（一个字符串，等长替换），不包含任何 DeepSeek 代码，
+也不是对任何东西的再分发。
 
 ---
 
-## Install
+## 环境要求
 
-### Step 1 — put the plugin somewhere
+- DeepSeek Harness **桌面版**（Electron），在 `0.2.2-rc.1` / Windows 上验证通过；
+  需要该版本暴露 `main`、`sidebar.panellist` 这两个客户端槽位。
+- 一个可编辑的 DSH profile（默认 `%USERPROFILE%\.dsh\profiles\desktop`）。
+- Node.js 与 pnpm（DSH 自带，系统装也行）。
+
+---
+
+## 安装
+
+### 第 1 步：把插件放到位
 
 ```powershell
 git clone https://github.com/xyj0727/dsh-deepseek-web.git D:\tools\dsh-deepseek-web
 ```
 
-### Step 2 — register it in your DSH profile
+### 第 2 步：在 DSH profile 里注册
 
-The profile is a small pnpm package. Edit `%USERPROFILE%\.dsh\profiles\desktop\package.json`
-and add the package to **both** places — dependencies *and* the bundle list:
+profile 本身是个小 pnpm 包。编辑 `%USERPROFILE%\.dsh\profiles\desktop\package.json`，
+**两处都要加**：依赖列表 + bundle 列表。
 
 ```jsonc
 {
@@ -79,7 +64,7 @@ and add the package to **both** places — dependencies *and* the bundle list:
   "dsh": {
     "profile": {
       "bundles": [
-        // ... the bundles that were already there ...
+        // ... 原有的 bundle ...
         "@local/dsh-deepseek-web"
       ]
     }
@@ -87,91 +72,80 @@ and add the package to **both** places — dependencies *and* the bundle list:
 }
 ```
 
-Then install it in the profile directory so the junction/lockfile is created:
+然后在 profile 目录里装一次，生成链接和锁文件：
 
 ```powershell
 cd $env:USERPROFILE\.dsh\profiles\desktop
 pnpm install
 ```
 
-> The package name `@local/dsh-deepseek-web` is just the name this repo was developed under.
-> A `link:` install accepts any name — if you rename it, keep the dependency key and the
-> bundle entry identical.
+> `@local/dsh-deepseek-web` 只是开发时用的包名，`link:` 安装对名字没有限制；
+> 如要改名，依赖键和 bundle 列表里的名字保持一致即可。
 
-Restart DSH (or reload the renderer). You should now see the whale entry in the sidebar.
+重启 DSH（或重载渲染进程），侧栏应出现鲸鱼入口。
 
-### Step 3 — apply the patch (this is the part that keeps you logged in)
+### 第 3 步：打补丁（免登录就靠这一步）
 
 ```powershell
 cd D:\tools\dsh-deepseek-web
-node patch-dsh.cjs --check   # prints the fuse state and whether the asar is patched
-node patch-dsh.cjs          # applies the patch (idempotent, creates a .bak)
+node patch-dsh.cjs --check   # 打印 fuse 状态、是否已打补丁
+node patch-dsh.cjs           # 打补丁（幂等，自动备份 .bak）
 ```
 
-Then **fully quit DSH and start it again** (the patch touches main-process code),
-and log in to DeepSeek once. From then on the session persists.
+然后**完全退出 DSH 再启动**（改的是主进程代码），登录一次 DeepSeek，之后就一直免登录。
 
-Undo at any time:
+想撤销：
 
 ```powershell
 node patch-dsh.cjs --revert
 ```
 
-> **After every DSH update, re-run `node patch-dsh.cjs`.**
-> An update replaces `app.asar` and therefore removes the patch; the symptom is simply
-> “the chat asks me to log in again”.
+> **DSH 每次更新后都要重跑一次 `node patch-dsh.cjs`。**
+> 更新会把 `app.asar` 换掉，补丁随之失效；表现就是「又开始要求重新登录」。
 
 ---
 
-## How it works
+## 实现原理
 
-**Plugin.** A client-side module registers a `sidebar.panellist` entry and a `main` panel.
-The panel asks the desktop host for a browser lease (`window.dshDesktop.browser.acquire()`),
-mounts a `<webview>` on that lease, and loads `https://chat.deepseek.com` **once** —
-see the note on the reload loop below. On startup it selects itself a single time, so DSH
-opens on the chat page instead of the conversation view.
+**插件侧**：客户端模块注册 `sidebar.panellist` 入口和一个 `main` 主面板。面板向桌面宿主申请
+浏览器租约（`window.dshDesktop.browser.acquire()`），在租约上挂 `<webview>`，然后**只加载一次**
+`https://chat.deepseek.com`（原因见下）。启动时它只自己选中一次，因此 DSH 打开即聊天页。
 
-**Patch.** The Harness creates the webview session partition as
-`` `dsh-sidebar-browser-${randomUUID()}` `` — a fresh, non-persistent partition per lease, so
-all cookies are thrown away when the app exits. `patch-dsh.cjs` rewrites that one expression to
-the fixed partition `` `persist:dsh-sidebar-browser` `` (a same-length or shorter replacement,
-so no asar offsets move), after verifying that the `EnableEmbeddedAsarIntegrityValidation`
-fuse is disabled. It is idempotent and keeps `app.asar.dsh-deepseek-web.bak`.
+**补丁侧**：Harness 给 webview 建会话分区时用的是
+`` `dsh-sidebar-browser-${randomUUID()}` `` —— 一次性、非持久分区，退出即丢 cookie。
+`patch-dsh.cjs` 把这一句改成固定分区 `` `persist:dsh-sidebar-browser` ``（等长或更短的替换，
+不动 asar 偏移），替换前会校验 `EnableEmbeddedAsarIntegrityValidation` fuse 处于关闭状态。
+脚本幂等，并保留 `app.asar.dsh-deepseek-web.bak`。
 
 ---
 
-## Known behaviour & caveats
+## 已知行为与注意事项
 
-- **Switching panels reloads the page.** The Harness layout unmounts a panel when another main
-  panel becomes active, so the webview is destroyed and re-created. The login survives the
-  reload (persistent partition); unsent text in the box does not.
-- **One shared login.** Because the patched partition is a single fixed name, every Harness
-  workspace/tab shares the same DeepSeek session.
-- **Reload loop (fixed).** `dom-ready` fires once per guest document; navigating again from that
-  handler makes the page reload itself forever. The panel now loads once per lease. If you write
-  your own panel, do not call `loadURL()` inside `dom-ready` unconditionally.
-- **DSH is a moving target.** The plugin depends on DSH-internal slot names and window APIs
-  (`main`, `sidebar.panellist`, `ctx.layout`, `window.dshDesktop.browser`). A Harness refactor
-  can break it; the patch depends on an exact string in `lib/main.js` and fails loudly
-  (keeping the backup) when it is not found.
-- **Trademark.** The whale icon comes from the MIT-licensed
-  [Gle-Res/DeepSeek](https://github.com/Gle-Res/DeepSeek) wrapper; the mark itself belongs to
-  DeepSeek. It is used here only to label the embedded service. The MIT licence of this repo
-  covers the code in this repository only.
+- **切换面板会重新加载页面**：DSH 布局在切换主面板时会卸载旧面板，webview 随之销毁重建。
+  因为是持久分区，登录态不会丢；输入框里没发送的文字会丢。
+- **共用一个登录**：补丁后的分区名是固定的，所以所有工作区/标签共用同一个 DeepSeek 会话。
+- **刷新死循环（已修）**：`dom-ready` 是按 document 触发的，若在这个回调里再 `loadURL()`，
+  页面会自己刷新自己，永远停不下来。现在每个租约只加载一次。自己写面板时别在 `dom-ready`
+  里无条件 `loadURL()`。
+- **DSH 改版会失效**：插件依赖 DSH 内部的槽位名和窗口 API（`main`、`sidebar.panellist`、
+  `ctx.layout`、`window.dshDesktop.browser`）；补丁依赖 `lib/main.js` 里的一段确切字符串，
+  找不到时会明确报错并保留备份，不会写坏文件。
+- **商标**：鲸鱼图标取自 MIT 许可的 [Gle-Res/DeepSeek](https://github.com/Gle-Res/DeepSeek)，
+  图形本身属于 DeepSeek，这里只用于标识所嵌入的服务。本仓库 MIT 只覆盖仓库内的代码。
 
 ---
 
-## Uninstall
+## 卸载
 
-1. Remove `@local/dsh-deepseek-web` from the profile's `dependencies` and `bundles`, then
-   `pnpm install` in the profile directory.
-2. `node patch-dsh.cjs --revert` to restore `app.asar` from the backup.
-3. Restart DSH.
+1. 从 profile 的 `dependencies` 和 `bundles` 里删掉 `@local/dsh-deepseek-web`，在 profile 目录
+   `pnpm install`。
+2. `node patch-dsh.cjs --revert` 用备份还原 `app.asar`。
+3. 重启 DSH。
 
 ---
 
-## License
+## 许可
 
 [MIT](LICENSE) © 2026 xyj0727
 
-中文说明见 [README.zh-CN.md](README.zh-CN.md)。
+English version: [README.en.md](README.en.md)
