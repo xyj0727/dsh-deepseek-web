@@ -1,0 +1,13 @@
+# build / scratch artifacts
+_icon/
+node_modules/
+*.log
+npm-debug.log*
+
+# OS noise
+.DS_Store
+Thumbs.db
+desktop.ini
+
+# local backup copies made by patch-dsh.cjs
+app.asar.dsh-deepseek-web.bak

@@ -1,0 +1,6 @@
+{
+  "meta": {
+    "title": "DeepSeek Chat",
+    "description": "Adds a DeepSeek whale entry to the sidebar that opens chat.deepseek.com as a full-bleed main panel, shown by default when Harness starts."
+  }
+}

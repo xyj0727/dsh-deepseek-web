@@ -1,0 +1,3 @@
+- insert:
+    - id: dsh-deepseek-web
+      name: '@local/dsh-deepseek-web'

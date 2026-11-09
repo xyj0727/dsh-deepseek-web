@@ -1,0 +1,51 @@
+{
+  "name": "@local/dsh-deepseek-web",
+  "version": "2.0.0",
+  "description": "DeepSeek Chat as a full-bleed main panel in the DeepSeek Harness desktop app: a chrome-less webview on chat.deepseek.com with a persistent login",
+  "type": "module",
+  "license": "MIT",
+  "author": "xyj0727",
+  "homepage": "https://github.com/xyj0727/dsh-deepseek-web",
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/xyj0727/dsh-deepseek-web.git"
+  },
+  "bugs": {
+    "url": "https://github.com/xyj0727/dsh-deepseek-web/issues"
+  },
+  "keywords": [
+    "dsh",
+    "deepseek-harness",
+    "plugin",
+    "deepseek",
+    "webview",
+    "electron",
+    "chat"
+  ],
+  "exports": {
+    ".": "./index.js",
+    "./client": "./client.js",
+    "./locale/*.json": "./locale/*.json",
+    "./icon": "./icon.svg"
+  },
+  "files": [
+    "index.js",
+    "client.js",
+    "cordis.patch.yml",
+    "locale/*.json",
+    "icon.svg",
+    "icon.png",
+    "patch-dsh.cjs"
+  ],
+  "dsh": {
+    "bundle": { "patch": "./cordis.patch.yml" },
+    "client": {
+      "platform": "web",
+      "immediately": true,
+      "inject": [
+        "@deepseek-ai/dsh-client-ui-layout",
+        "@deepseek-ai/dsh-client-ui-sidebar"
+      ]
+    }
+  }
+}
