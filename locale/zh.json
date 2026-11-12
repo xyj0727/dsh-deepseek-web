@@ -1,6 +1,6 @@
 {
   "meta": {
-    "title": "DeepSeek Chat",
-    "description": "在左侧栏新增 DeepSeek 鲸鱼入口，点开即是一个全幅的 chat.deepseek.com 网页聊天页，打开 DSH 时默认显示。"
+    "title": "DeepSeek Chat 与 Grok",
+    "description": "在左侧栏新增 DeepSeek 鲸鱼入口和 Grok 入口，点开即是全幅的 chat.deepseek.com / grok.com 网页聊天页，打开 DSH 时默认显示 DeepSeek Chat。"
   }
 }
